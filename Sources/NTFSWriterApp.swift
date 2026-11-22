@@ -16,11 +16,6 @@ struct NTFSWriterApp: App {
                 .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
                     driver.refresh()
                 }
-                .toolbar {
-                    SettingsLink {
-                        Label("Settings", systemImage: "gearshape")
-                    }
-                }
         }
         .windowResizability(.contentSize)
 
