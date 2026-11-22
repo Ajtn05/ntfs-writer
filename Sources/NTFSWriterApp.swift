@@ -5,11 +5,12 @@ import SwiftUI
 struct NTFSWriterApp: App {
     @StateObject private var disks = Disks()
     @StateObject private var driver = DriverState()
+    @NSApplicationDelegateAdaptor(WriterStatusMenu.self) private var statusMenu
     @AppStorage("showsMenuBarItem") private var showsMenuBarItem = true
 
     var body: some Scene {
         Window("NTFS Writer", id: "volumes") {
-            WriterView(disks: disks, driver: driver)
+            WriterView(disks: disks, driver: driver, statusMenu: statusMenu, showsMenuBarItem: showsMenuBarItem)
                 .frame(width: 500, height: 410)
                 .onAppear { driver.refresh() }
                 .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
@@ -30,30 +31,9 @@ struct NTFSWriterApp: App {
             .formStyle(.grouped)
             .frame(width: 360)
             .fixedSize(horizontal: false, vertical: true)
-        }
-
-        MenuBarExtra("NTFS Writer", systemImage: "externaldrive", isInserted: $showsMenuBarItem) {
-            WriterMenu()
-        }
-    }
-}
-
-private struct WriterMenu: View {
-    @Environment(\.openWindow) private var openWindow
-    @Environment(\.openSettings) private var openSettings
-
-    var body: some View {
-        Button("Open NTFS Writer") {
-            NSApp.activate()
-            openWindow(id: "volumes")
-        }
-        Button("Settings…") {
-            NSApp.activate()
-            openSettings()
-        }
-        Divider()
-        Button("Quit NTFS Writer") {
-            NSApp.terminate(nil)
+            .onChange(of: showsMenuBarItem) { _, isVisible in
+                statusMenu.setVisible(isVisible)
+            }
         }
     }
 }
@@ -98,6 +78,10 @@ final class DriverState: ObservableObject {
 private struct WriterView: View {
     @ObservedObject var disks: Disks
     @ObservedObject var driver: DriverState
+    let statusMenu: WriterStatusMenu
+    let showsMenuBarItem: Bool
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.openSettings) private var openSettings
     @Environment(\.openURL) private var openURL
 
     var body: some View {
@@ -154,6 +138,11 @@ private struct WriterView: View {
             }
         }
         .padding(22)
+        .onAppear { [openWindow, openSettings] in
+            statusMenu.openMainWindow = { openWindow(id: "volumes") }
+            statusMenu.openSettings = { openSettings() }
+            statusMenu.setVisible(showsMenuBarItem)
+        }
     }
 
     private var setupCard: some View {
