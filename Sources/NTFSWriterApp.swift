@@ -5,6 +5,7 @@ import SwiftUI
 struct NTFSWriterApp: App {
     @StateObject private var disks = Disks()
     @StateObject private var driver = DriverState()
+    @AppStorage("showsMenuBarItem") private var showsMenuBarItem = true
 
     var body: some Scene {
         Window("NTFS Writer", id: "volumes") {
@@ -14,8 +15,46 @@ struct NTFSWriterApp: App {
                 .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
                     driver.refresh()
                 }
+                .toolbar {
+                    SettingsLink {
+                        Label("Settings", systemImage: "gearshape")
+                    }
+                }
         }
         .windowResizability(.contentSize)
+
+        Settings {
+            Form {
+                Toggle("Show NTFS Writer in the menu bar", isOn: $showsMenuBarItem)
+            }
+            .formStyle(.grouped)
+            .frame(width: 360)
+            .fixedSize(horizontal: false, vertical: true)
+        }
+
+        MenuBarExtra("NTFS Writer", systemImage: "externaldrive", isInserted: $showsMenuBarItem) {
+            WriterMenu()
+        }
+    }
+}
+
+private struct WriterMenu: View {
+    @Environment(\.openWindow) private var openWindow
+    @Environment(\.openSettings) private var openSettings
+
+    var body: some View {
+        Button("Open NTFS Writer") {
+            NSApp.activate()
+            openWindow(id: "volumes")
+        }
+        Button("Settings…") {
+            NSApp.activate()
+            openSettings()
+        }
+        Divider()
+        Button("Quit NTFS Writer") {
+            NSApp.terminate(nil)
+        }
     }
 }
 

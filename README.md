@@ -9,6 +9,8 @@ NTFS Writer is a small Finder companion for Apple silicon Macs running macOS 27 
 3. Connect the NTFS drive. If the app shows **Read only**, click **Enable Writing**. For a mounted volume, **Check Writing** verifies access using a temporary one-byte file that the app removes.
 4. Open the volume in Finder. Use the eject button when you finish. The button ejects the whole disk, including any other volumes on it.
 
+Open **Settings…** from the NTFS Writer menu bar icon or the app’s gear button to change **Show NTFS Writer in the menu bar**. Choose **Quit NTFS Writer** from the menu bar icon or the app menu to exit.
+
 If a drive stays read-only after the extension is enabled, eject it from Windows before disconnecting it, or fully shut down Windows before unplugging it. Use Windows to check a drive marked dirty.
 
 The release app uses an ad hoc signature and has no Apple notarization. For a local build, follow the instructions below. The bundled driver retains its original Developer ID signature and notarization. [Apple’s guide to opening downloaded Mac apps](https://support.apple.com/en-us/102445)
